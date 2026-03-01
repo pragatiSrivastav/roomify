@@ -22,9 +22,15 @@ const Upload = ({ onComplete }: UploadProps) => {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const navigate = useNavigate();
+
+  const ALLOWED_FILE_TYPES = ["image/jpeg", "image/png", "image/jpg"];
+
+  const isValidFileType = (file: File): boolean => {
+    return ALLOWED_FILE_TYPES.includes(file.type);
+  };
 
   const processFile = (selectedFile: File) => {
     if (!isSignedIn) return;
@@ -69,9 +75,15 @@ const Upload = ({ onComplete }: UploadProps) => {
   };
 
   const handleFileSelect = (selectedFile: File) => {
-    if (isSignedIn) {
-      processFile(selectedFile);
+    if (!isSignedIn) return;
+
+    if (!isValidFileType(selectedFile)) {
+      console.error("Invalid file type. Only JPG, JPEG, and PNG files are allowed.");
+      alert("Invalid file type. Only JPG, JPEG, and PNG files are allowed.");
+      return;
     }
+
+    processFile(selectedFile);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -134,7 +146,7 @@ const Upload = ({ onComplete }: UploadProps) => {
                 : "Please sign in to upload files."}
             </p>
 
-            <p className="help">Maximum file size: 50MB</p>
+            <p className="help">Maximum file size: 10MB</p>
           </div>
         </div>
       ) : (
